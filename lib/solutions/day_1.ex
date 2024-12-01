@@ -16,7 +16,7 @@ defmodule Aoc2024.Day1 do
   def part2(input) do
     [first_list, second_list] = build_lists(input)
 
-    Enum.zip_reduce(first_list, second_list, 0, fn a, _, acc ->
+    Enum.reduce(first_list, 0, fn a, acc ->
       acc + a * Enum.count(second_list, &(&1 == a))
     end)
   end

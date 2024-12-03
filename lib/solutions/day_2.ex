@@ -1,13 +1,13 @@
 defmodule Aoc2024.Day2 do
   def part1(input) do
     get_nums(input)
-    |> Enum.map(&is_safe(&1, 0))
+    |> Enum.map(&is_safe(&1, false))
     |> Enum.reduce(0, fn is_safe, acc -> if is_safe, do: acc + 1, else: acc end)
   end
 
   def part2(input) do
     get_nums(input)
-    |> Enum.map(&is_safe(&1, 1))
+    |> Enum.map(&is_safe(&1, true))
     |> Enum.reduce(0, fn is_safe, acc -> if is_safe, do: acc + 1, else: acc end)
   end
 
@@ -19,42 +19,34 @@ defmodule Aoc2024.Day2 do
     |> Enum.map(fn nums -> Enum.map(nums, &String.to_integer/1) end)
   end
 
-  defp is_safe(nums, threshold) do
-    is_increasing = Enum.at(nums, 0) < Enum.at(nums, 1)
-    is_safe(nums, threshold, is_increasing)
-  end
-
-  defp is_safe([], _, _), do: true
-  defp is_safe([_], _, _), do: true
-
-  defp is_safe([a, b | rest], threshold, is_increasing) do
-    res = compare(a, b, is_increasing)
-
-    if res do
-      is_safe([b | rest], threshold, is_increasing)
+  defp is_safe(nums, dampen) do
+    if valid_report?(nums) do
+      true
     else
-      if threshold > 0 do
-        next = Enum.at(rest, 0)
-        res = compare(b, next, is_increasing)
-        IO.inspect(res)
-        if res do
-          is_safe([b | rest], threshold - 1, is_increasing)
-        else
-          if compare(a, next, is_increasing) do
-            is_safe([a | rest], threshold - 1, is_increasing)
-          else
-            false
-          end
-        end
+      if dampen do
+        nums
+        |> Stream.with_index()
+        |> Stream.map(fn {_, i} -> List.delete_at(nums, i) end)
+        |> Enum.find(&valid_report?/1)
+      else
+        false
       end
     end
   end
 
-  defp compare(a, b, is_increasing) do
-    if is_increasing do
-      a < b && b - a <= 3
-    else
-      a > b && a - b <= 3
-    end
+  def valid_report?(report) do
+    all_increasing?(report) or all_decreasing?(report)
   end
+
+  defp all_increasing?([_]), do: true
+  defp all_increasing?([a, b | rest]) when b - a <= 3 and b > a do
+    all_increasing?([b | rest])
+  end
+  defp all_increasing?(_), do: false
+
+  defp all_decreasing?([_]), do: true
+  defp all_decreasing?([a, b | rest]) when a - b <= 3 and a > b do
+    all_decreasing?([b | rest])
+  end
+  defp all_decreasing?(_), do: false
 end

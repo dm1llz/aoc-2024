@@ -3,8 +3,14 @@ defmodule Aoc2024.Day3 do
     find_mul(input)
   end
 
-  def part2(_input) do
-    48
+  def part2(input) do
+    input
+    |> String.split("do")
+    |> Enum.map(&find_dos/1)
+    |> Enum.filter(& &1)
+    |> Enum.map(&find_mul/1)
+    |> Enum.sum()
+
   end
 
   defp find_mul(input) do
@@ -39,4 +45,12 @@ defmodule Aoc2024.Day3 do
   end
 
   defp valid_number?(num), do: num >= 0 and num <= 999
+
+  defp find_dos(step) do
+    if String.starts_with?(step, "n't()") do
+      nil
+    else
+      step
+    end
+  end
 end

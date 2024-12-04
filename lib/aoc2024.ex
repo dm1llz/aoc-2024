@@ -4,7 +4,7 @@ defmodule Aoc2024 do
   def run(day) do
     input = File.read!("input/day#{day}.txt")
 
-    IO.inspect(Day3.part1(input))
+    IO.inspect(Day3.part2(input))
   end
 end
 
